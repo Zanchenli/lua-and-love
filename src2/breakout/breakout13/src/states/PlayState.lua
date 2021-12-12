@@ -30,6 +30,7 @@ function PlayState:enter(params)
     self.level = params.level
 
     self.recoverPoints = 5000
+    self.powerupPoints = 1000
 
     -- give ball random starting velocity
     self.ball.dx = math.random(-200, 200)
@@ -53,6 +54,9 @@ function PlayState:update(dt)
     -- update positions based on velocity
     self.paddle:update(dt)
     self.ball:update(dt)
+    if self.powerupPoints==100000 then
+        self.powerup:update(dt)
+    end
 
     if self.ball:collides(self.paddle) then
         -- raise ball above paddle in case it goes below it, then reverse dy
@@ -97,6 +101,11 @@ function PlayState:update(dt)
 
                 -- play recover sound effect
                 gSounds['recover']:play()
+            end
+
+            if self.score > self.powerupPoints then
+                self.powerupPoints = 100000
+                self.powerup = Powerup(math.random(7))
             end
 
             -- go to our victory screen if there are no more bricks left
@@ -182,7 +191,8 @@ function PlayState:update(dt)
                 score = self.score,
                 highScores = self.highScores,
                 level = self.level,
-                recoverPoints = self.recoverPoints
+                recoverPoints = self.recoverPoints,
+                powerupPoints = self.powerupPoints
             })
         end
     end
@@ -210,6 +220,9 @@ function PlayState:render()
 
     self.paddle:render()
     self.ball:render()
+    if self.powerupPoints==100000 then
+        self.powerup:render()                   
+    end
 
     renderScore(self.score)
     renderHealth(self.health)
