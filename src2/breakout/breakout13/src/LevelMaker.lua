@@ -114,7 +114,7 @@ function LevelMaker.createMap(level)
 
             table.insert(bricks, b)
 
-            -- Lua's version of the 'continue' statement
+            -- Lua's version of the 'continue' statement  goto continue会来到这里
             ::continue::
         end
     end 
