@@ -30,7 +30,9 @@ function PlayState:enter(params)
     self.level = params.level
 
     self.recoverPoints = 5000
-    self.powerupPoints = 1000
+    self.powerupPoints = 100
+    self.flag_poweruped = false
+    self.flag_powerup_hit = false
 
     -- give ball random starting velocity
     self.ball.dx = math.random(-200, 200)
@@ -54,8 +56,17 @@ function PlayState:update(dt)
     -- update positions based on velocity
     self.paddle:update(dt)
     self.ball:update(dt)
-    if self.powerupPoints==100000 then
+
+    -- update powerup after it is spawned
+    if self.flag_poweruped == true or self.flag_powerup_hit == true then
         self.powerup:update(dt)
+    end
+
+    if self.flag_poweruped == true and self.powerup:collides(self.paddle) then
+        self.powerup:hit()
+        self.powerupPoints = 100000
+        self.flag_poweruped = false
+        self.flag_powerup_hit = true
     end
 
     if self.ball:collides(self.paddle) then
@@ -103,8 +114,9 @@ function PlayState:update(dt)
                 gSounds['recover']:play()
             end
 
-            if self.score > self.powerupPoints then
-                self.powerupPoints = 100000
+            -- if we have enough scores, spawn a powerup at random locations and start falling down
+            if self.flag_poweruped == false and self.score > self.powerupPoints then
+                self.flag_poweruped = true
                 self.powerup = Powerup(math.random(7))
             end
 
@@ -197,6 +209,13 @@ function PlayState:update(dt)
         end
     end
 
+    -- if powerup falls below bounds, remove it
+    if self.flag_poweruped == true and self.powerup.y >= VIRTUAL_HEIGHT then
+        self.powerup = nil
+        self.flag_poweruped = not self.flag_poweruped
+        self.powerupPoints = self.powerupPoints * 2
+    end
+
     -- for rendering particle systems
     for k, brick in pairs(self.bricks) do
         brick:update(dt)
@@ -218,9 +237,14 @@ function PlayState:render()
         brick:renderParticles()
     end
 
+    if self.flag_powerup_hit == true then
+        self.powerup:renderParticles()
+        -- self.flag_powerup_hit = false
+    end
+
     self.paddle:render()
     self.ball:render()
-    if self.powerupPoints==100000 then
+    if self.flag_poweruped == true then
         self.powerup:render()                   
     end
 
