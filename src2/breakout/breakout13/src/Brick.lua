@@ -47,6 +47,12 @@ paletteColors = {
         ['r'] = 251/255,
         ['g'] = 242/255,
         ['b'] = 54/255
+    },
+
+    [6] = {
+        ['r'] = 251/255,
+        ['g'] = 242/255,
+        ['b'] = 54/255
     }
 }
 
@@ -106,19 +112,23 @@ function Brick:hit()
 
     -- if we're at a higher tier than the base, we need to go down a tier
     -- if we're already at the lowest color, else just go down a color
-    if self.tier > 0 then
-        if self.color == 1 then
-            self.tier = self.tier - 1
-            self.color = 5
-        else
-            self.color = self.color - 1
-        end
+    if self.tier == 3 and self.color == 6 then
+        self.inPlay = false
     else
-        -- if we're in the first tier and the base color, remove brick from play
-        if self.color == 1 then
-            self.inPlay = false
+        if self.tier > 0 then
+            if self.color == 1 then
+                self.tier = self.tier - 1
+                self.color = 5
+            else
+                self.color = self.color - 1
+            end
         else
-            self.color = self.color - 1
+            -- if we're in the first tier and the base color, remove brick from play
+            if self.color == 1 then
+                self.inPlay = false
+            else
+                self.color = self.color - 1
+            end
         end
     end
 

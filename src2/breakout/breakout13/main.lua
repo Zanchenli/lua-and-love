@@ -124,6 +124,7 @@ function love.load()
     })
 
     -- play our music outside of all states and set it to looping
+    love.audio.setVolume(.1)
     gSounds['music']:play()
     gSounds['music']:setLooping(true)
 
@@ -283,6 +284,16 @@ function renderHealth(health)
         healthX = healthX + 11
     end
 end
+
+-- renders the current key count
+function renderKeys(keyNum)
+    local keyX = VIRTUAL_WIDTH - 200
+    love.graphics.draw(gTextures['main'], gFrames['powerups'][10], keyX, 2)
+    love.graphics.setFont(gFonts['small'])
+    love.graphics.print('Score:', keyX + 17, 4)
+    love.graphics.printf(tostring(keyNum), keyX + 17, 4, 40, 'right')
+end
+
 
 --[[
     Renders the current FPS.

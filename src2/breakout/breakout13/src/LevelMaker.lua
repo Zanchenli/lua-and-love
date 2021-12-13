@@ -47,6 +47,11 @@ function LevelMaker.createMap(level)
     -- highest color of the highest tier, no higher than 5
     local highestColor = math.min(5, level % 5 + 3)
 
+    -- chances of spawning a locked bricks, determine its position
+    local lockedBrick = math.random(1, numRows * numCols)
+    local locked_x = lockedBrick % 3 == 0 and 3 or lockedBrick % 3
+    local locked_y = math.floor(lockedBrick / 3) + 1
+
     -- lay out bricks such that they touch each other and fill the space
     for y = 1, numRows do
         -- whether we want to enable skipping for this row
@@ -111,6 +116,16 @@ function LevelMaker.createMap(level)
                 b.color = solidColor
                 b.tier = solidTier
             end 
+
+            -- if this is the location of gold key, place it there
+            if locked_x == x and locked_y == y then
+                b.color = 6
+                b.tier =  3
+            end
+
+            --testing, spawn all bricks as locked bricks
+            -- b.color = 6
+            -- b.tier =  3
 
             table.insert(bricks, b)
 
