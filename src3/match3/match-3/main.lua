@@ -56,6 +56,7 @@ function love.load()
     })
 
     -- set music to loop and start
+    love.audio.setVolume(.2)
     gSounds['music']:setLooping(true)
     gSounds['music']:play()
 
