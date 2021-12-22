@@ -13,10 +13,21 @@
 
 Board = Class{}
 
-function Board:init(x, y)
+function Board:init(x, y, boardLevel)
     self.x = x
     self.y = y
     self.matches = {}
+    self.level = boardLevel
+
+    -- determine the number of patterns than can be used within the board, increase as the level increases
+    self.numTilePattern = 1
+    if self.level >= 6 then
+        self.numTilePattern = 6
+    else
+        self.numTilePattern = self.level % 6
+    end
+
+    
 
     self:initializeTiles()
 end
@@ -24,14 +35,16 @@ end
 function Board:initializeTiles()
     self.tiles = {}
 
+
     for tileY = 1, 8 do
         
         -- empty table that will serve as a new row
         table.insert(self.tiles, {})
 
         for tileX = 1, 8 do
+
             -- create a new tile at X,Y with a random color and variety
-            table.insert(self.tiles[tileY], Tile(tileX, tileY, math.random(18), math.random(6)))
+            table.insert(self.tiles[tileY], Tile(tileX, tileY, math.random(numTileColor), math.random(self.numTilePattern)))
         end
     end
 
@@ -57,8 +70,8 @@ function Board:calculateMatches()
     for y = 1, 8 do
         local colorToMatch = self.tiles[y][1].color
 
-        matchNum = 1
-        
+
+
         -- every horizontal tile
         for x = 2, 8 do
             -- if this is the same color as the one we're trying to match...
@@ -227,7 +240,7 @@ function Board:getFallingTiles()
 
             -- if the tile is nil, we need to add a new one
             if not tile then
-                local tile = Tile(x, y, math.random(18), math.random(6))
+                local tile = Tile(x, y, math.random(numTileColor), math.random(self.numTilePattern))
                 tile.y = -32
                 self.tiles[y][x] = tile
 

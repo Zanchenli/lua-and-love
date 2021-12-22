@@ -40,6 +40,8 @@ require 'src/states/GameOverState'
 require 'src/states/PlayState'
 require 'src/states/StartState'
 
+numTileColor = 9
+
 gSounds = {
     ['music'] = love.audio.newSource('sounds/music3.mp3','static'),
     ['select'] = love.audio.newSource('sounds/select.wav','static'),
