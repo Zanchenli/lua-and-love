@@ -25,6 +25,8 @@ function Tile:init(x, y, color, variety)
     -- tile appearance/points
     self.color = color
     self.variety = variety
+    self.bomb = self.color == 1 and 1 or 0
+    -- self.bomb = 0
 end
 
 function Tile:update(dt)

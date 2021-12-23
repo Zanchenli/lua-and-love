@@ -85,10 +85,21 @@ function Board:calculateMatches()
                 if matchNum >= 3 then
                     local match = {}
 
-                    -- go backwards from here by matchNum
-                    for x2 = x - 1, x - matchNum, -1 do
-                        -- add each tile to the match that's in that match
-                        table.insert(match, self.tiles[y][x2])
+                    -- check if the match tile is of bomb type
+                    if self.tiles[y][x-1].bomb == 1 then
+                        
+                        for x2 = 8, 1, -1 do
+                            -- add each tile to the match that's in that row
+                            table.insert(match, self.tiles[y][x2])
+                        end
+                    
+                    else
+
+                        -- go backwards from here by matchNum
+                        for x2 = x - 1, x - matchNum, -1 do
+                            -- add each tile to the match that's in that match
+                            table.insert(match, self.tiles[y][x2])
+                        end
                     end
 
                     -- add this match to our total matches table
@@ -108,12 +119,18 @@ function Board:calculateMatches()
         if matchNum >= 3 then
             local match = {}
             
+            -- if the match tile is of bomb type, get the entire row
+            if self.tiles[y][8].bomb == 1 then
+                matchNum = 8
+            end
+
             -- go backwards from end of last row by matchNum
             for x = 8, 8 - matchNum + 1, -1 do
                 table.insert(match, self.tiles[y][x])
             end
 
             table.insert(matches, match)
+            matchNum = 1
         end
     end
 
@@ -133,10 +150,19 @@ function Board:calculateMatches()
                 if matchNum >= 3 then
                     local match = {}
 
-                    for y2 = y - 1, y - matchNum, -1 do
-                        table.insert(match, self.tiles[y2][x])
+                    -- check if the match tile is of bomb type
+                    if self.tiles[y-1][x].bomb == 1 then
+    
+                        for y2 = 8, 1, -1 do
+                            -- add each tile to the match that's in that row
+                            table.insert(match, self.tiles[y2][x])
+                        end
+                    
+                    else
+                        for y2 = y - 1, y - matchNum, -1 do
+                            table.insert(match, self.tiles[y2][x])
+                        end
                     end
-
                     table.insert(matches, match)
                 end
 
@@ -153,12 +179,19 @@ function Board:calculateMatches()
         if matchNum >= 3 then
             local match = {}
             
+            -- if the match tile is of bomb type, get the entire row
+            if self.tiles[8][x].bomb == 1 then
+                matchNum = 8
+            end
+
+
             -- go backwards from end of last row by matchNum
-            for y = 8, 8 - matchNum, -1 do
+            for y = 8, 8 - matchNum + 1, -1 do
                 table.insert(match, self.tiles[y][x])
             end
 
             table.insert(matches, match)
+            matchNum = 1
         end
     end
 
