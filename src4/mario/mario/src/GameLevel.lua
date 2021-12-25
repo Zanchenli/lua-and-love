@@ -27,7 +27,7 @@ function GameLevel:clear()
     end
 
     for i = #self.entities, 1, -1 do
-        if not self.objects[i] then
+        if not self.entities[i] then
             table.remove(self.objects, i)
         end
     end

@@ -20,7 +20,7 @@ function PlayState:init()
 
     self.player = Player({
         x = 0, y = 0,
-        width = 16, height = 20,
+        width = 15, height = 20,
         texture = 'green-alien',
         stateMachine = StateMachine {
             ['idle'] = function() return PlayerIdleState(self.player) end,
