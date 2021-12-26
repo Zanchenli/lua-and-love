@@ -26,6 +26,8 @@ function LevelMaker.generate(width, height)
     local keyPosition = math.random(width)
     local lockedBlockPosition = math.random(width)
 
+    local numEmptyColumn = 0
+
 
     -- insert blank tables into tiles for later access
     for x = 1, height do
@@ -35,7 +37,6 @@ function LevelMaker.generate(width, height)
     -- column by column generation instead of row; sometimes better for platformers
     for x = 1, width do
         local tileID = TILE_ID_EMPTY
-        local numEmptyColumn = 0
         
         -- lay out the empty space
         for y = 1, 6 do
@@ -123,30 +124,33 @@ function LevelMaker.generate(width, height)
                                     solid = true,
 
                                     onCollide = function(player, obj)
-                                        gStateMachine:change('play', {levelWidth = player.map.width, score = player.score})
+                                        local flag = GameObject {
+                                            texture = 'flags',
+                                            x = (width - 1) * TILE_SIZE + 8,
+                                            y = (lockedBlockHeight - 1) * TILE_SIZE,
+                                            width = 16,
+                                            height = 16,
+                                            frame = FLAGS[math.random(#FLAGS)],
+                                            collidable = false,
+                                            consumable = false,
+                                            solid = false,
+
+                                        }
+                                        table.insert(objects, flag)
+
+                                        gSounds['pickup']:play()
+
+                                        Timer.tween(1, {
+                                            [flag] = {y = 5 * TILE_SIZE} 
+                                        })
+                                        :finish(function()
+                                            gStateMachine:change('play', {levelWidth = player.map.width, score = player.score})
+                                        end)
+
                                     end
                                 }
 
-                                local flag = GameObject {
-                                    texture = 'flags',
-                                    x = (width - 1) * TILE_SIZE + 8,
-                                    y = (lockedBlockHeight - 1) * TILE_SIZE,
-                                    width = 16,
-                                    height = 16,
-                                    frame = FLAGS[math.random(#FLAGS)],
-                                    collidable = false,
-                                    consumable = false,
-                                    solid = false,
-
-                                    -- gem has its own function to add to the player's score
-                                    -- onConsume = function(player, object)
-                                    --     gSounds['pickup']:play()
-                                    --     player.score = player.score + 100
-                                    -- end
-                                }
-
-                                table.insert(objects, pole)
-                                table.insert(objects, flag)
+                                table.insert(objects, pole) 
 
 
                             end
@@ -217,7 +221,7 @@ function LevelMaker.generate(width, height)
             end
 
             -- chance to spawn a block
-            if math.random(10) == 1 then
+            if math.random(10) == 1 and x ~= width and blockHeight ~= 2 then
                 table.insert(objects,
 
                     -- jump block

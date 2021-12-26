@@ -27,7 +27,6 @@ function love.load()
     love.window.setTitle('Super 50 Bros.')
 
     math.randomseed(os.time())
-    
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
         fullscreen = false,
         vsync = true,

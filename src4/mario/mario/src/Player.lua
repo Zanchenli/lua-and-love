@@ -69,6 +69,8 @@ end
 function Player:checkObjectCollisions()
     local collidedObjects = {}
 
+    self.x = self.x + 1
+    self.width = self.width - 2
     for k, object in pairs(self.level.objects) do
         if object:collides(self) then
             if object.solid then
@@ -79,6 +81,9 @@ function Player:checkObjectCollisions()
             end
         end
     end
+
+    self.x = self.x - 1
+    self.width = self.width + 2
 
     return collidedObjects
 end

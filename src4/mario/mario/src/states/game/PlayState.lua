@@ -110,9 +110,9 @@ function PlayState:spawnEnemies()
         -- flag for whether there's ground on this column of the level
         local groundFound = false
 
-        for y = 1, self.tileMap.height do
+        for y = 6, self.tileMap.height do
             if not groundFound then
-                if self.tileMap.tiles[y][x].id == TILE_ID_GROUND then
+                if self.tileMap.tiles[y][x].id == TILE_ID_GROUND and self.tileMap.tiles[y][x].topper then
                     groundFound = true
 
                     -- random chance, 1 in 20
