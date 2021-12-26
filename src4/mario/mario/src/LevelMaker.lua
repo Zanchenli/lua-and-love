@@ -22,6 +22,11 @@ function LevelMaker.generate(width, height)
     local tileset = math.random(20)
     local topperset = math.random(20)
 
+    -- predetermine the position of the key and the locked block
+    local keyPosition = math.random(width)
+    local lockedBlockPosition = math.random(width)
+
+
     -- insert blank tables into tiles for later access
     for x = 1, height do
         table.insert(tiles, {})
@@ -30,6 +35,7 @@ function LevelMaker.generate(width, height)
     -- column by column generation instead of row; sometimes better for platformers
     for x = 1, width do
         local tileID = TILE_ID_EMPTY
+        local numEmptyColumn = 0
         
         -- lay out the empty space
         for y = 1, 6 do
@@ -37,15 +43,131 @@ function LevelMaker.generate(width, height)
                 Tile(x, y, tileID, nil, tileset, topperset))
         end
 
+        -- check and spawn the key
+        if x == keyPosition then
+            tileID = TILE_ID_GROUND
+
+            local keyHeight = 5
+
+            for y = 7, height do
+                table.insert(tiles[y],
+                    Tile(x, y, tileID, y == 7 and topper or nil, tileset, topperset))
+            end
+
+            local key = GameObject {
+                texture = 'keys_and_locks',
+                x = (x - 1) * TILE_SIZE,
+                y = (keyHeight - 1) * TILE_SIZE,
+                width = 16,
+                height = 16,
+                frame = math.random(#KEYS),
+                collidable = true,
+                consumable = true,
+                solid = false,
+
+                -- gem has its own function to add to the player's score
+                onConsume = function(player, object)
+                    gSounds['pickup']:play()
+                    player.key = player.key + 1
+                end
+            }
+            table.insert(objects, key)
+            goto continue
+
+        -- check to spawn the locked block
+        elseif x == lockedBlockPosition then
+            tileID = TILE_ID_GROUND
+
+            local lockedBlockHeight = 4
+
+            for y = 7, height do
+                table.insert(tiles[y],
+                    Tile(x, y, tileID, y == 7 and topper or nil, tileset, topperset))
+            end
+
+            table.insert(objects,
+
+                    -- jump block
+                    GameObject {
+                        texture = 'keys_and_locks',
+                        x = (x - 1) * TILE_SIZE,
+                        y = (lockedBlockHeight - 1) * TILE_SIZE,
+                        width = 16,
+                        height = 16,
+
+                        -- make it a random variant
+                        frame = math.random(LOCKEDBRICK[1], LOCKEDBRICK[#LOCKEDBRICK]),
+                        collidable = true,
+                        hit = false,
+                        solid = true,
+
+                        -- collision function takes itself
+                        onCollide = function(player, obj)
+
+                            -- spawn a gem if we haven't already hit the block
+                            if  player.key >= 1 then
+                                obj.hit = true
+                                obj.solid = false
+                                player.key = 0
+                                gSounds['powerup-reveal']:play()
+
+                                local pole = GameObject {
+                                    texture = 'poles',
+                                    x = (width - 1) * TILE_SIZE,
+                                    y = (lockedBlockHeight - 1) * TILE_SIZE,
+                                    width = 16,
+                                    height = 64,
+                                    frame = math.random(#POLES),
+                                    collidable = true,
+                                    consumable = false,
+                                    solid = true,
+
+                                    onCollide = function(player, obj)
+                                        gStateMachine:change('play', {levelWidth = player.map.width, score = player.score})
+                                    end
+                                }
+
+                                local flag = GameObject {
+                                    texture = 'flags',
+                                    x = (width - 1) * TILE_SIZE + 8,
+                                    y = (lockedBlockHeight - 1) * TILE_SIZE,
+                                    width = 16,
+                                    height = 16,
+                                    frame = FLAGS[math.random(#FLAGS)],
+                                    collidable = false,
+                                    consumable = false,
+                                    solid = false,
+
+                                    -- gem has its own function to add to the player's score
+                                    -- onConsume = function(player, object)
+                                    --     gSounds['pickup']:play()
+                                    --     player.score = player.score + 100
+                                    -- end
+                                }
+
+                                table.insert(objects, pole)
+                                table.insert(objects, flag)
+
+
+                            end
+                        end
+                    }
+            )
+            goto continue
+
+        end
+
         -- chance to just be emptiness
-        if math.random(7) == 1 and x ~= 1 then
+        -- numEmptyColumn makes sure that we don't generate too large gap to jump across
+        if math.random(7) == 1 and x ~= 1 and x~= width and numEmptyColumn < 2 then
+            numEmptyColumn = numEmptyColumn + 1
             for y = 7, height do
                 table.insert(tiles[y],
                     Tile(x, y, tileID, nil, tileset, topperset))
             end
         else
             tileID = TILE_ID_GROUND
-
+            numEmptyColumn = 0
             local blockHeight = 4
 
             for y = 7, height do
@@ -54,11 +176,12 @@ function LevelMaker.generate(width, height)
             end
 
             -- chance to generate a pillar
-            if math.random(8) == 1 then
+            if math.random(8) == 1 and x ~= width then
                 blockHeight = 2
                 
                 -- chance to generate bush on pillar
                 if math.random(8) == 1 then
+                    numEmptyColumn = -1
                     table.insert(objects,
                         GameObject {
                             texture = 'bushes',
@@ -112,7 +235,7 @@ function LevelMaker.generate(width, height)
                         solid = true,
 
                         -- collision function takes itself
-                        onCollide = function(obj)
+                        onCollide = function(player, obj)
 
                             -- spawn a gem if we haven't already hit the block
                             if not obj.hit then
@@ -157,6 +280,7 @@ function LevelMaker.generate(width, height)
                 )
             end
         end
+        ::continue::
     end
 
     local map = TileMap(width, height)

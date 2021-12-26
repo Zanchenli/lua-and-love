@@ -55,21 +55,38 @@ function PlayerJumpState:update(dt)
         self.player:checkRightCollisions(dt)
     end
 
+    -- temporarily move the x and width to check for leeway
+    self.player.x = self.player.x + 3
+    self.player.width = self.player.width - 3 
+
     -- check if we've collided with any collidable game objects
     for k, object in pairs(self.player.level.objects) do
         if object:collides(self.player) then
             if object.solid then
-                object.onCollide(object)
+                object.onCollide(self.player, object)
 
-                self.player.y = object.y + object.height
-                self.player.dy = 0
-                self.player:changeState('falling')
+                if object.hit and not object.solid then
+                    table.remove(self.player.level.objects, k)
+                else
+                    self.player.y = object.y + object.height
+                    self.player.dy = 0
+
+                    -- -- restore the correct position and width
+                    -- self.player.x = self.player.x - 3
+                    -- self.player.width = self.player.width + 3 
+
+                    self.player:changeState('falling')
+                end
             elseif object.consumable then
                 object.onConsume(self.player)
                 table.remove(self.player.level.objects, k)
             end
         end
     end
+
+    -- restore the correct position and width
+    self.player.x = self.player.x - 3
+    self.player.width = self.player.width + 3 
 
     -- check if we've collided with any entities and die if so
     for k, entity in pairs(self.player.level.entities) do

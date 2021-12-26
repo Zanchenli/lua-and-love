@@ -58,6 +58,11 @@ function PlayerFallingState:update(dt)
         self.player:checkRightCollisions(dt)
     end
 
+
+    -- temporarily move the x and width to check for leeway
+    self.player.x = self.player.x + 3
+    self.player.width = self.player.width - 3 
+
     -- check if we've collided with any collidable game objects
     for k, object in pairs(self.player.level.objects) do
         if object:collides(self.player) then
@@ -76,6 +81,10 @@ function PlayerFallingState:update(dt)
             end
         end
     end
+
+    -- restore the correct position and width
+    self.player.x = self.player.x - 3
+    self.player.width = self.player.width + 3 
 
     -- check if we've collided with any entities and kill them if so
     for k, entity in pairs(self.player.level.entities) do
