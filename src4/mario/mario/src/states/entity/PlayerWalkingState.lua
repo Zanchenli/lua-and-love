@@ -35,7 +35,7 @@ function PlayerWalkingState:update(dt)
         self.player.y = self.player.y - 1
 
         -- check to see whether there are any tiles beneath us
-        -- 如果下面没有箱子 而且 左下和右下地块都为空（出界） 而且 左下、右下地块为不可碰撞类型（空气地块）
+        -- 如果下面没有箱子 而且 左下和右下地块都为空（出界） 而且 左下、右下地块为不可碰撞类型（空气地块）123
         if #collidedObjects == 0 and (tileBottomLeft and tileBottomRight) and (not tileBottomLeft:collidable() and not tileBottomRight:collidable()) then
             self.player.dy = 0
             self.player:changeState('falling')
