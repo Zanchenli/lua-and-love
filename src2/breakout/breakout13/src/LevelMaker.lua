@@ -49,8 +49,11 @@ function LevelMaker.createMap(level)
 
     -- chances of spawning a locked bricks, determine its position
     local lockedBrick = math.random(1, numRows * numCols)
-    local locked_x = lockedBrick % 3 == 0 and 3 or lockedBrick % 3
-    local locked_y = math.floor(lockedBrick / 3) + 1
+    local locked_x = lockedBrick % numCols == 0 and numCols or lockedBrick % numCols
+    local locked_y = math.floor(lockedBrick / numCols) + 1
+    print(lockedBrick)
+    print(locked_x)
+    print(locked_y)
 
     -- lay out bricks such that they touch each other and fill the space
     for y = 1, numRows do
