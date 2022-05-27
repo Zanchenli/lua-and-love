@@ -160,3 +160,12 @@ end
 function Brick:renderParticles()
     love.graphics.draw(self.psystem, self.x + 16, self.y + 8)
 end
+
+
+function Brick:checkbricklocked()
+    if self.color == 6 and self.tier == 3 then
+        return true
+    else
+        return false
+    end
+end
